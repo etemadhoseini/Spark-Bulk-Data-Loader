@@ -36,8 +36,6 @@ This project showcases the capabilities of Apache Spark and PySpark, demonstrati
 
 ## Architecture
 
-![Architecture Diagram](path/to/your/architecture-diagram.png)  <!-- Replace with your architecture diagram path -->
-
 This project employs a microservices architecture using Docker containers for isolated environments. The data flow is as follows:
 
 1. **Data Ingestion**: Data is read from Hive tables.
