@@ -1,0 +1,90 @@
+services:
+  spark-master:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spark-master:latest
+    user: root
+    command: /opt/bitnami/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    container_name: spark-master
+    environment:
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+      - SPARK_LOG_DIR=/opt/spark/logs
+      - SPARK_LOG_LEVEL=INFO
+    ports:
+      - "8080:8080" # Spark Web UI
+      - "8081:7077" # Spark Master port
+    volumes:
+      - ./data:/data # Shared data volume
+      - .:/opt/spark-apps
+      - ./logs:/opt/spark/logs
+    networks:
+      - spark-network
+
+  spark-worker-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spark-worker:latest
+    command: /opt/bitnami/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    container_name: spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    volumes:
+      - .:/opt/spark-apps
+      - ./logs:/opt/spark/logs
+    depends_on:
+      - spark-master
+    networks:
+      - spark-network
+
+  spark-worker-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spark-worker:latest
+    command: /opt/bitnami/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
+    container_name: spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    volumes:
+      - .:/opt/spark-apps
+      - ./logs:/opt/spark/logs
+    depends_on:
+      - spark-master
+    networks:
+      - spark-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - spark-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - spark-network
+
+networks:
+  spark-network:
+    driver: bridge
