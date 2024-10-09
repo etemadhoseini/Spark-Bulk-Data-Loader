@@ -101,7 +101,7 @@ This project is licensed under the MIT License. See the [LICENSE](assets/LICENCE
 For any inquiries, please reach out to:
 
 - **Amir Hosein Etemad Hoseini**: [etemadhoseini@gmail.com](mailto:etemadhoseini@gmail.com)
-- **LinkedIn**: [Your LinkedIn Profile](https://www.linkedin.com/in/etemadhoseini/)
+- **LinkedIn**: [Etemad Hoseini](https://www.linkedin.com/in/etemadhoseini/)
 
 ---
 
